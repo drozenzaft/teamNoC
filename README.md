@@ -1,2 +1,4 @@
 # teamNoC
-tiffany chen + daniel rozenzaft graphics final project 2017-18
+Tiffany Chen, Daniel Rozenzaft
+Period 5 Computer Graphics
+Final Project, 2017-18
