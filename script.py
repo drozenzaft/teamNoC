@@ -3,6 +3,8 @@ from display import *
 from matrix import *
 from draw import *
 
+
+#DANIEL: FIX THIS. IF AMB ISN'T SPECIFIED, DON'T USE AMB. USE THE DEFAULTS
 num_frames = 1
 base = "basename"
 knobs = []
@@ -111,6 +113,10 @@ def run(filename):
     sreflect = [0.5,
                 0.5,
                 0.5]
+    amb = []
+    aref = []
+    dref = []
+    sref = []
 
     color = [0, 0, 0]
     tmp = new_matrix()
@@ -178,19 +184,32 @@ def run(filename):
                         args[0], args[1], args[2],
                         args[3], args[4], args[5])
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading)
+                areft = [args[0],args[3],args[6]]
+                dref = [args[1],args[4],args[7]]
+                sref = [args[2],args[5],args[8]]
+                draw_polygons(tmp, screen, zbuffer, view, amb, light, aref, dref, sref, shading)
                 tmp = []
             elif c == 'sphere':
+                if isinstance(args[0], str):
+                    consts = symbols[args[0]]
+                    args = args[1:]
+                if isinstance(args[-1], str):
+                    coords = args[-1]
                 add_sphere(tmp,
                            args[0], args[1], args[2], args[3], step_3d)
                 matrix_mult( stack[-1], tmp )
                 draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading)
                 tmp = []
             elif c == 'torus':
+                if isinstance(args[0], str):
+                    consts = args[0]
+                    args = args[1:]
+                if isinstance(args[-1], str):
+                    coords = args[-1]
                 add_torus(tmp,
                           args[0], args[1], args[2], args[3], args[4], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading)
+                draw_polygons(tmp, screen, zbuffer, view, amb, light, areflect, dreflect, sreflect, shading)
                 tmp = []
             elif c == 'line':
                 if isinstance(args[0], str):
@@ -231,11 +250,14 @@ def run(filename):
                 stack.append([x[:] for x in stack[-1]] )
             elif c == 'pop':
                 stack.pop()
+            elif c == 'constants':
+                symbols[args[0]] = args[1:]
+            elif c == 'ambient':
+                amb = args[:]
             elif c == 'display':
                 display(screen)
             elif c == 'save':
                 save_extension(screen, args[0])
-
         if is_anim:
             save_extension(screen, ("./anim/" + base + ("%03d" % int(frame)) + ".png"))
 
