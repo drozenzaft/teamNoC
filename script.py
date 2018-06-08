@@ -113,10 +113,9 @@ def run(filename):
     sreflect = [0.5,
                 0.5,
                 0.5]
-    amb = []
-    aref = []
-    dref = []
-    sref = []
+    consts = [areflect[0],dreflect[0],sreflect[0],areflect[1],dreflect[1],
+                  sreflect[1],areflect[2],dreflect[2],sreflect[2]]
+    default = consts[:]
 
     color = [0, 0, 0]
     tmp = new_matrix()
@@ -176,23 +175,24 @@ def run(filename):
 
             if c == 'box':
                 if isinstance(args[0], str):
-                    consts = args[0]
+                    consts = symbols[args[0]][:]
                     args = args[1:]
+                else:
+                    consts = default[:]
                 if isinstance(args[-1], str):
                     coords = args[-1]
                 add_box(tmp,
                         args[0], args[1], args[2],
                         args[3], args[4], args[5])
                 matrix_mult( stack[-1], tmp )
-                areft = [args[0],args[3],args[6]]
-                dref = [args[1],args[4],args[7]]
-                sref = [args[2],args[5],args[8]]
-                draw_polygons(tmp, screen, zbuffer, view, amb, light, aref, dref, sref, shading)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, aref, dref, sref, shading)
                 tmp = []
             elif c == 'sphere':
                 if isinstance(args[0], str):
-                    consts = symbols[args[0]]
+                    consts = symbols[args[0]][:]
                     args = args[1:]
+                else:
+                    consts = default[:]
                 if isinstance(args[-1], str):
                     coords = args[-1]
                 add_sphere(tmp,
@@ -202,14 +202,16 @@ def run(filename):
                 tmp = []
             elif c == 'torus':
                 if isinstance(args[0], str):
-                    consts = args[0]
+                    consts = symbols[args[0]][:]
                     args = args[1:]
+                else:
+                    consts = default[:]
                 if isinstance(args[-1], str):
                     coords = args[-1]
                 add_torus(tmp,
                           args[0], args[1], args[2], args[3], args[4], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, amb, light, areflect, dreflect, sreflect, shading)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading)
                 tmp = []
             elif c == 'line':
                 if isinstance(args[0], str):
@@ -253,7 +255,7 @@ def run(filename):
             elif c == 'constants':
                 symbols[args[0]] = args[1:]
             elif c == 'ambient':
-                amb = args[:]
+                ambient = args[:]
             elif c == 'display':
                 display(screen)
             elif c == 'save':
