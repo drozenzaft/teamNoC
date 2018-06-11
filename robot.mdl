@@ -1,4 +1,4 @@
-shading wireframe
+shading phong
 //BODY
 push
 move 250 250 0
