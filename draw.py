@@ -464,5 +464,9 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, colornormal0, colornorma
         g += dg
         b += db
         loop_start+= 1
-    color = [int(r), int(g), int(b)]
+    if shading == "phong":
+        normal = [r, g, b]
+        color = get_lighting(normal, extra[0], extra[1], extra[2], extra[3], extra[4], extra[5] )
+    else:
+        color = [int(r), int(g), int(b)]
     plot( screen, zbuffer, color, x, y, z )
