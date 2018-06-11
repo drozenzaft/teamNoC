@@ -102,7 +102,7 @@ def run(filename):
              [0,
               255,
               255]]
-    light = []
+    lights = []
     areflect = [0.1,
                 0.1,
                 0.1]
@@ -141,11 +141,11 @@ def run(filename):
     print "Basename:", base
     print "Num Frames: ", num_frames
 
-    print symbols
-    print commands
+    #print symbols
+    #print commands
 
     for frame in range(int(num_frames)):
-        print frame
+        #print frame
         print symbols
 
         if "shading" in symbols.keys():
@@ -157,7 +157,6 @@ def run(filename):
             symbols[knob][1] = knobs[frame][knob]
 
         for command in commands:
-            #print command
             c = command['op']
             args = command['args']
             if (not args == None):
@@ -185,13 +184,11 @@ def run(filename):
                     sreflect = [default[2],default[5],default[8]]    
                 if command['cs'] != None:
                     coords = command['cs']
-                if len(light) == 0:
-                    light.append(defLight)
                 add_box(tmp,
                         args[0], args[1], args[2],
                         args[3], args[4], args[5])
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading, intensity)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, lights, areflect, dreflect, sreflect, shading, intensity)
                 tmp = []
             elif c == 'sphere':
                 intensity = [0,0,0]
@@ -210,12 +207,10 @@ def run(filename):
                     sreflect = [default[2],default[5],default[8]]
                 if command['cs'] != None:
                     coords = command['cs']
-                if len(light) == 0:
-                    light.append(defLight)
                 add_sphere(tmp,
                            args[0], args[1], args[2], args[3], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading, intensity)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, lights, areflect, dreflect, sreflect, shading, intensity)
                 tmp = []
             elif c == 'torus':
                 intensity = [0,0,0]
@@ -234,12 +229,10 @@ def run(filename):
                     sreflect = [default[2],default[5],default[8]]
                 if command['cs'] != None:
                     coords = command['cs']
-                if len(light) == 0:
-                    light.append(defLight)
                 add_torus(tmp,
                           args[0], args[1], args[2], args[3], args[4], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading, intensity)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, lights, areflect, dreflect, sreflect, shading, intensity)
                 tmp = []
             elif c == 'line':
                 if command['constants'] != None:
@@ -281,15 +274,15 @@ def run(filename):
                 stack.append([x[:] for x in stack[-1]] )
             elif c == 'pop':
                 stack.pop()
-            #elif c == 'constants':
-                #print command
             elif c == 'ambient':
                 ambient = args[:]
             elif c == 'light':
-                '''insert light code here. here's my question: are the xyz arguments coordinates like [500,500,0], or are they a view vector like [0.5,0,75,1]? also, why should lights be put in the symbol table if the user never names them? seems like having it be its own internal variable would make more sense, since a dictionary is kind of useless without a name. i get that you can make up a name for it, but can't the user mess things up by creating a variable with the same name as the key containing the light data structure? for now, i won't put it in the symbol table.'''
-                '''light is not showing up in the command dictionary...why?????'''
-                newLight = [[args[3],args[4],args[5]],[args[0],args[1],args[2]]]
-                light.append(newLight)
+                print symbols[command['light']]
+                col = symbols[command['light']][1]['color']
+                loca = symbols[command['light']][1]['location']
+                light = [loca,col]
+                #'l0': ['light', {'color': [255.0, 0.0, 0.0], 'location': [-0.5, -0.75, 1.0]}]
+                lights.append(light)
             elif c == 'display':
                 display(screen)
             elif c == 'save':
