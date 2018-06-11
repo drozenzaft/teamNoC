@@ -9,21 +9,29 @@ COLOR = 1
 SPECULAR_EXP = 4
 
 #lighting functions
-def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect ):
+def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect, intensity ):
     normalize(normal)
-    normalize(light[LOCATION])
     normalize(view)
 
     a = calculate_ambient(ambient, areflect)
-    d = calculate_diffuse(light, dreflect, normal)
-    s = calculate_specular(light, sreflect, view, normal)
+    d = [0,0,0]
+    s = [0,0,0]
+
+    for l in range(len(light)):
+        normalize(light[l][LOCATION])
+        dif = calculate_diffuse(light[l], dreflect, normal)
+        spec = calculate_specular(light[l], sreflect, view, normal)
+        for ind in range(3):
+            d[ind] += dif[ind]
+            s[ind] += spec[ind]
 
     i = [0, 0, 0]
-    i[RED] = int(a[RED] + d[RED] + s[RED])
-    i[GREEN] = int(a[GREEN] + d[GREEN] + s[GREEN])
-    i[BLUE] = int(a[BLUE] + d[BLUE] + s[BLUE])
+    i[RED] = int(a[RED] + d[RED] + s[RED] + intensity[RED])
+    i[GREEN] = int(a[GREEN] + d[GREEN] + s[GREEN] + intensity[GREEN])
+    i[BLUE] = int(a[BLUE] + d[BLUE] + s[BLUE] + intensity[BLUE])
+    
     limit_color(i)
-
+    #print 'color: ' + str(i)
     return i
 
 
@@ -64,10 +72,18 @@ def calculate_specular(light, sreflect, view, normal):
     return s
 
 def limit_color(color):
-    color[RED] = 255 if color[RED] > 255 else color[RED]
-    color[GREEN] = 255 if color[GREEN] > 255 else color[GREEN]
-    color[BLUE] = 255 if color[BLUE] > 255 else color[BLUE]
-
+    if color[RED] > 255:
+        color[RED] = 255
+    elif color[RED] < 0:
+        color[RED] = 0
+    if color[GREEN] > 255:
+        color[GREEN] = 255
+    elif color[GREEN] < 0:
+        color[GREEN] = 0
+    if color[BLUE] > 255:
+        color[BLUE] = 255
+    elif color[BLUE] < 0:
+        color[BLUE] = 0
 
 #vector functions
 def normalize(vector):

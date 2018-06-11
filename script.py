@@ -3,8 +3,6 @@ from display import *
 from matrix import *
 from draw import *
 
-
-#DANIEL: FIX THIS. IF AMB ISN'T SPECIFIED, DON'T USE AMB. USE THE DEFAULTS
 num_frames = 1
 base = "basename"
 knobs = []
@@ -98,12 +96,13 @@ def run(filename):
     ambient = [50,
                50,
                50]
-    light = [[0.5,
+    defLight = [[0.5,
               0.75,
               1],
              [0,
               255,
               255]]
+    light = []
     areflect = [0.1,
                 0.1,
                 0.1]
@@ -116,7 +115,6 @@ def run(filename):
     consts = [areflect[0],dreflect[0],sreflect[0],areflect[1],dreflect[1],
                   sreflect[1],areflect[2],dreflect[2],sreflect[2]]
     default = consts[:]
-
     color = [0, 0, 0]
     tmp = new_matrix()
     ident( tmp )
@@ -162,66 +160,97 @@ def run(filename):
             #print command
             c = command['op']
             args = command['args']
-
             if (not args == None):
                 args = args[:]
-
             if (c in ["move", "scale", "rotate"]) and (not args == None) and ("knob" in command) and (not command["knob"] == None):
                 knob = command["knob"]
                 #print command
                 for i in range(len(args)):
                     if not isinstance(args[i], basestring):
                         args[i] = args[i] * symbols[knob][1]
-
             if c == 'box':
-                if isinstance(args[0], str):
-                    consts = symbols[args[0]][:]
-                    args = args[1:]
+                intensity = [0,0,0]
+                if command['constants'] != None:
+                    consts = symbols[command['constants']][1]
+                    areflect = [consts['red'][0],consts['green'][0],consts['blue'][0]]
+                    dreflect = [consts['red'][1],consts['green'][1],consts['blue'][1]]
+                    sreflect = [consts['red'][2],consts['green'][2],consts['blue'][2]]
+                    if len(consts['blue']) > 3:
+                        intensity[0] = consts['blue'][3]
+                        intensity[1] = consts['blue'][4]
+                        intensity[2] = consts['blue'][5]
                 else:
-                    consts = default[:]
-                if isinstance(args[-1], str):
-                    coords = args[-1]
+                    areflect = [default[0],default[3],default[6]]
+                    dreflect = [default[1],default[4],default[7]]
+                    sreflect = [default[2],default[5],default[8]]    
+                if command['cs'] != None:
+                    coords = command['cs']
+                if len(light) == 0:
+                    light.append(defLight)
                 add_box(tmp,
                         args[0], args[1], args[2],
                         args[3], args[4], args[5])
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, aref, dref, sref, shading)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading, intensity)
                 tmp = []
             elif c == 'sphere':
-                if isinstance(args[0], str):
-                    consts = symbols[args[0]][:]
-                    args = args[1:]
+                intensity = [0,0,0]
+                if command['constants'] != None:
+                    consts = symbols[command['constants']][1]
+                    areflect = [consts['red'][0],consts['green'][0],consts['blue'][0]]
+                    dreflect = [consts['red'][1],consts['green'][1],consts['blue'][1]]
+                    sreflect = [consts['red'][2],consts['green'][2],consts['blue'][2]]
+                    if len(consts['blue']) > 3:
+                        intensity[0] = consts['blue'][3]
+                        intensity[1] = consts['blue'][4]
+                        intensity[2] = consts['blue'][5]
                 else:
-                    consts = default[:]
-                if isinstance(args[-1], str):
-                    coords = args[-1]
+                    areflect = [default[0],default[3],default[6]]
+                    dreflect = [default[1],default[4],default[7]]
+                    sreflect = [default[2],default[5],default[8]]
+                if command['cs'] != None:
+                    coords = command['cs']
+                if len(light) == 0:
+                    light.append(defLight)
                 add_sphere(tmp,
                            args[0], args[1], args[2], args[3], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading, intensity)
                 tmp = []
             elif c == 'torus':
-                if isinstance(args[0], str):
-                    consts = symbols[args[0]][:]
-                    args = args[1:]
+                intensity = [0,0,0]
+                if command['constants'] != None:
+                    consts = symbols[command['constants']][1]
+                    areflect = [consts['red'][0],consts['green'][0],consts['blue'][0]]
+                    dreflect = [consts['red'][1],consts['green'][1],consts['blue'][1]]
+                    sreflect = [consts['red'][2],consts['green'][2],consts['blue'][2]]
+                    if len(consts['blue']) > 3:
+                        intensity[0] = consts['blue'][3]
+                        intensity[1] = consts['blue'][4]
+                        intensity[2] = consts['blue'][5]
                 else:
-                    consts = default[:]
-                if isinstance(args[-1], str):
-                    coords = args[-1]
+                    areflect = [default[0],default[3],default[6]]
+                    dreflect = [default[1],default[4],default[7]]
+                    sreflect = [default[2],default[5],default[8]]
+                if command['cs'] != None:
+                    coords = command['cs']
+                if len(light) == 0:
+                    light.append(defLight)
                 add_torus(tmp,
                           args[0], args[1], args[2], args[3], args[4], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading, intensity)
                 tmp = []
             elif c == 'line':
-                if isinstance(args[0], str):
-                    consts = args[0]
-                    args = args[1:]
-                if isinstance(args[3], str):
-                    coords = args[3]
-                    args = args[:3] + args[4:]
-                if isinstance(args[-1], str):
-                    coords1 = args[-1]
+                if command['constants'] != None:
+                    consts = symbols[command['constants']][1]
+                    areflect = [consts['red'][0],consts['green'][0],consts['blue'][0]]
+                    dreflect = [consts['red'][1],consts['green'][1],consts['blue'][1]]
+                    sreflect = [consts['red'][2],consts['green'][2],consts['blue'][2]]
+                if command['cs0'] != None:
+                    coords = command['cs0']
+                if command['cs1'] != None:
+                    coords1 = command['cs1']
                 add_edge(tmp,
                          args[0], args[1], args[2], args[3], args[4], args[5])
                 matrix_mult( stack[-1], tmp )
@@ -252,14 +281,19 @@ def run(filename):
                 stack.append([x[:] for x in stack[-1]] )
             elif c == 'pop':
                 stack.pop()
-            elif c == 'constants':
-                symbols[args[0]] = args[1:]
+            #elif c == 'constants':
+                #print command
             elif c == 'ambient':
                 ambient = args[:]
+            elif c == 'light':
+                '''insert light code here. here's my question: are the xyz arguments coordinates like [500,500,0], or are they a view vector like [0.5,0,75,1]? also, why should lights be put in the symbol table if the user never names them? seems like having it be its own internal variable would make more sense, since a dictionary is kind of useless without a name. i get that you can make up a name for it, but can't the user mess things up by creating a variable with the same name as the key containing the light data structure? for now, i won't put it in the symbol table.'''
+                '''light is not showing up in the command dictionary...why?????'''
+                newLight = [[args[3],args[4],args[5]],[args[0],args[1],args[2]]]
+                light.append(newLight)
             elif c == 'display':
                 display(screen)
             elif c == 'save':
-                save_extension(screen, args[0])
+                save_extension(screen, args[0]+'.png')
         if is_anim:
             save_extension(screen, ("./anim/" + base + ("%03d" % int(frame)) + ".png"))
 

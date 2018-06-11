@@ -3,7 +3,7 @@ from matrix import *
 from math import *
 from gmath import *
 
-def scanline_convert(polygons, i, screen, zbuffer, colornormal, shading, extra):
+def scanline_convert(polygons, i, screen, zbuffer, colornormal, shading, extra, intensity):
     flip = False
     BOT = 0
     TOP = 2
@@ -58,7 +58,7 @@ def scanline_convert(polygons, i, screen, zbuffer, colornormal, shading, extra):
         colornormal0 = [r0, g0, b0]
         colornormal1 = [r1, g1, b1]
 
-        draw_line(int(x0), y, z0, int(x1), y, z1, screen, zbuffer, colornormal0, colornormal1, shading, extra)
+        draw_line(int(x0), y, z0, int(x1), y, z1, screen, zbuffer, colornormal0, colornormal1, shading, extra, intensity)
         x0+= dx0
         z0+= dz0
         x1+= dx1
@@ -91,7 +91,7 @@ def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x1, y1, z1);
     add_point(polygons, x2, y2, z2);
 
-def draw_polygons( matrix, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading ):
+def draw_polygons( matrix, screen, zbuffer, view, ambient, light, areflect, dreflect, sreflect, shading, intensity ):
     if len(matrix) < 2:
         print 'Need at least 3 points to draw'
         return
@@ -122,33 +122,33 @@ def draw_polygons( matrix, screen, zbuffer, view, ambient, light, areflect, dref
         normal = calculate_normal(matrix, point)[:]
         if dot_product(normal, view) > 0:
             if shading == "flat":
-                color = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect )
+                color = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect, intensity )
                 colors = [color, color, color]
-                scanline_convert(matrix, point, screen, zbuffer, colors, shading, [])
+                scanline_convert(matrix, point, screen, zbuffer, colors, shading, [], intensity)
             elif shading == "wireframe":
-                color = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect )
+                color = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect, intensity )
                 points = [ (matrix[point][0], matrix[point][1], matrix[point][2]),
                     (matrix[point+1][0], matrix[point+1][1], matrix[point+1][2]),
                     (matrix[point+2][0], matrix[point+2][1], matrix[point+2][2]) ]
-                draw_line(int(points[0][0]), int(points[0][1]), int(points[0][2]), int(points[1][0]), int(points[1][1]), int(points[1][2]), screen, zbuffer, color, color, shading, [])
-                draw_line(int(points[0][0]), int(points[0][1]), int(points[0][2]), int(points[2][0]), int(points[2][1]), int(points[2][2]), screen, zbuffer, color, color, shading, [])
-                draw_line(int(points[2][0]), int(points[2][1]), int(points[2][2]), int(points[1][0]), int(points[1][1]), int(points[1][2]), screen, zbuffer, color, color, shading, [])
+                draw_line(int(points[0][0]), int(points[0][1]), int(points[0][2]), int(points[1][0]), int(points[1][1]), int(points[1][2]), screen, zbuffer, color, color, shading, [], intensity)
+                draw_line(int(points[0][0]), int(points[0][1]), int(points[0][2]), int(points[2][0]), int(points[2][1]), int(points[2][2]), screen, zbuffer, color, color, shading, [], intensity)
+                draw_line(int(points[2][0]), int(points[2][1]), int(points[2][2]), int(points[1][0]), int(points[1][1]), int(points[1][2]), screen, zbuffer, color, color, shading, [], intensity)
             elif shading == "gouraud":
                 normal0 = vnormals[tuple(matrix[point])]
                 normal1 = vnormals[tuple(matrix[point+1])]
                 normal2 = vnormals[tuple(matrix[point+2])]
-                color0 = get_lighting(normal0, view, ambient, light, areflect, dreflect, sreflect )
-                color1 = get_lighting(normal1, view, ambient, light, areflect, dreflect, sreflect )
-                color2 = get_lighting(normal2, view, ambient, light, areflect, dreflect, sreflect )
+                color0 = get_lighting(normal0, view, ambient, light, areflect, dreflect, sreflect, intensity )
+                color1 = get_lighting(normal1, view, ambient, light, areflect, dreflect, sreflect, intensity )
+                color2 = get_lighting(normal2, view, ambient, light, areflect, dreflect, sreflect, intensity )
                 colors = [color0, color1, color2]
-                scanline_convert(matrix, point, screen, zbuffer, colors, shading, [])
+                scanline_convert(matrix, point, screen, zbuffer, colors, shading, [], intensity)
             elif shading == "phong":
                 normal0 = vnormals[tuple(matrix[point])]
                 normal1 = vnormals[tuple(matrix[point+1])]
                 normal2 = vnormals[tuple(matrix[point+2])]
                 normals = [normal0, normal1, normal2]
                 extra = [view, ambient, light, areflect, dreflect, sreflect]
-                scanline_convert(matrix, point, screen, zbuffer, normals, shading, extra)
+                scanline_convert(matrix, point, screen, zbuffer, normals, shading, extra, intensity)
 
             # draw_line( int(matrix[point][0]),
             #            int(matrix[point][1]),
@@ -372,7 +372,7 @@ def add_point( matrix, x, y, z=0 ):
     matrix.append( [x, y, z, 1] )
 
 
-def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, colornormal0, colornormal1, shading, extra ):
+def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, colornormal0, colornormal1, shading, extra, intensity ):
 
     #swap points if going right -> left
     if x0 > x1:
@@ -445,7 +445,7 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, colornormal0, colornorma
     while ( loop_start < loop_end ):
         if shading == "phong":
             normal = [r, g, b]
-            color = get_lighting(normal, extra[0], extra[1], extra[2], extra[3], extra[4], extra[5] )
+            color = get_lighting(normal, extra[0], extra[1], extra[2], extra[3], extra[4], extra[5], intensity )
         else:
             color = [int(r), int(g), int(b)]
         plot( screen, zbuffer, color, x, y, z )
@@ -466,7 +466,7 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, colornormal0, colornorma
         loop_start+= 1
     if shading == "phong":
         normal = [r, g, b]
-        color = get_lighting(normal, extra[0], extra[1], extra[2], extra[3], extra[4], extra[5] )
+        color = get_lighting(normal, extra[0], extra[1], extra[2], extra[3], extra[4], extra[5], intensity )
     else:
         color = [int(r), int(g), int(b)]
     plot( screen, zbuffer, color, x, y, z )
