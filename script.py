@@ -1,4 +1,5 @@
 import mdl
+import os
 from display import *
 from matrix import *
 from draw import *
@@ -288,6 +289,8 @@ def run(filename):
             elif c == 'save':
                 save_extension(screen, args[0]+'.png')
         if is_anim:
+            if not os.path.exists('anim'):
+                os.mkdir('anim')
             save_extension(screen, ("./anim/" + base + ("%03d" % int(frame)) + ".png"))
 
         tmp = new_matrix()
