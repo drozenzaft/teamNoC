@@ -4,10 +4,11 @@ constants c0 1 0.5 0.75 1 0.5 0.75 1 0.5 0.75
 light l0 -0.5 -0.75 1 255 0 0
 light l1 0.5 0.75 1 0 0 255
 frames 50
-basename diamond
+basename skyscraper
 push
 move 250 100 250
-scale 3 3 3
+scale 3 4 3
 rotate y 360 spinny
-vary spinny 0 49 0 1
-mesh c0 :diamond.obj
+vary spinny 0 24 0 1 sin
+vary spinny 25 49 0 1 cos
+mesh c0 :skyscraper.obj

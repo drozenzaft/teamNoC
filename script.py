@@ -273,7 +273,7 @@ def run(filename):
                 tmp = []
             elif c == 'mesh':
                 intensity = [0,0,0]
-                if command['constants'] != None:
+                if command['constants'] != ":" and command['constants'] != None:
                     consts = symbols[command['constants']][1]
                     areflect = [consts['red'][0],consts['green'][0],consts['blue'][0]]
                     dreflect = [consts['red'][1],consts['green'][1],consts['blue'][1]]
