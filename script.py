@@ -78,13 +78,50 @@ def second_pass(commands):
 
         if c == "vary":
             knob = command['knob']
-            increment = (args[3] - args[2]) / (args[1] - args[0])
             curr = args[2]
-
-            for i in range(int(args[0]), int(args[1])):
-                #print "curr: " + str(curr)
-                knobs[i][knob] = curr
-                curr += increment
+            if len(args) > 4 and args[4] <= 0:
+                print 'Must use an exponent greater than 0 for polynomial or exponential varying.'
+                return
+            increment = (args[3] - args[2]) / (args[1] - args[0] + 1)
+            for i in range(int(args[0]), int(args[1])+1):
+                if len(args) > 4:
+                    if isinstance(args[4],float):
+                        if increment < 0:
+                            curr = ((increment * (i-args[1]-1)) ** args[4])
+                        else:
+                            curr = (increment * (i+1)) ** args[4]
+                        knobs[i][knob] = curr
+                    elif  args[4] == 'sin':
+                        if increment < 0:
+                            curr = math.sin((increment * (i-args[1]-1) * math.pi/2))
+                        else:
+                            curr = math.sin((increment * (i+1) * math.pi/2))
+                        knobs[i][knob] = curr
+                    elif args[4] == 'cos':
+                        #the 1-cos accounts for cos being a decreasing function over the interval
+                        if increment < 0:
+                            curr = 1-math.cos((increment * (i-args[1]-1) * math.pi/2))
+                        else:
+                            curr = 1-math.cos((increment * (i+1) * math.pi/2))
+                        knobs[i][knob] = curr
+                    elif args[4] == 'tan':
+                        if increment < 0:
+                            curr = math.tan((increment * (i-args[1]-1) * math.pi/4))
+                        else:
+                            curr = math.tan((increment * (i+1) * math.pi/4))
+                        knobs[i][knob] = curr
+                    #i think i'm reaching here
+                    elif args[4] == 'ln':
+                        if increment < 0:
+                            curr = (2-math.log((increment * (i-args[1]-1) * math.e))) ** -1
+                        else:
+                            curr = (2-math.log((increment * (i+1) * math.e))) ** -1
+                        knobs[i][knob] = curr
+                else:
+                    knobs[i][knob] = curr
+                    curr += increment
+                #print str(i) + ': ' + str(curr)
+            #print '\n'
 
 def run(filename):
     """
@@ -164,7 +201,6 @@ def run(filename):
                 args = args[:]
             if (c in ["move", "scale", "rotate"]) and (not args == None) and ("knob" in command) and (not command["knob"] == None):
                 knob = command["knob"]
-                #print command
                 for i in range(len(args)):
                     if not isinstance(args[i], basestring):
                         args[i] = args[i] * symbols[knob][1]
@@ -300,11 +336,9 @@ def run(filename):
             elif c == 'ambient':
                 ambient = args[:]
             elif c == 'light':
-                print symbols[command['light']]
                 col = symbols[command['light']][1]['color']
                 loca = symbols[command['light']][1]['location']
                 light = [loca,col]
-                #'l0': ['light', {'color': [255.0, 0.0, 0.0], 'location': [-0.5, -0.75, 1.0]}]
                 lights.append(light)
             elif c == 'display':
                 display(screen)
