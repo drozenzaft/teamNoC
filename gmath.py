@@ -31,7 +31,6 @@ def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect, int
     i[BLUE] = int(a[BLUE] + d[BLUE] + s[BLUE] + intensity[BLUE])
     
     limit_color(i)
-    #print 'color: ' + str(i)
     return i
 
 

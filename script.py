@@ -78,13 +78,20 @@ def second_pass(commands):
 
         if c == "vary":
             knob = command['knob']
-            increment = (args[3] - args[2]) / (args[1] - args[0])
             curr = args[2]
-
-            for i in range(int(args[0]), int(args[1])):
-                #print "curr: " + str(curr)
+            if args[4] <= 0:
+                print 'Must use an exponent greater than 0 for polynomial or exponential varying.'
+                return
+            increment = (args[3] - args[2]) / (args[1] - args[0] + 1)
+            for i in range(int(args[0]), int(args[1])+1):
+                if args[4] >= 0: 
+                    if increment < 0:
+                        curr = ((increment * (i-args[1]-1)) ** args[4])
+                    else:
+                        curr = (increment * (i+1)) ** args[4]
+                print str(i) + ': ' + str(curr)
                 knobs[i][knob] = curr
-                curr += increment
+            print '\n'
 
 def run(filename):
     """
@@ -164,7 +171,6 @@ def run(filename):
                 args = args[:]
             if (c in ["move", "scale", "rotate"]) and (not args == None) and ("knob" in command) and (not command["knob"] == None):
                 knob = command["knob"]
-                #print command
                 for i in range(len(args)):
                     if not isinstance(args[i], basestring):
                         args[i] = args[i] * symbols[knob][1]
@@ -278,11 +284,9 @@ def run(filename):
             elif c == 'ambient':
                 ambient = args[:]
             elif c == 'light':
-                print symbols[command['light']]
                 col = symbols[command['light']][1]['color']
                 loca = symbols[command['light']][1]['location']
                 light = [loca,col]
-                #'l0': ['light', {'color': [255.0, 0.0, 0.0], 'location': [-0.5, -0.75, 1.0]}]
                 lights.append(light)
             elif c == 'display':
                 display(screen)
