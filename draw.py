@@ -2,6 +2,7 @@ from display import *
 from matrix import *
 from math import *
 from gmath import *
+import re
 
 def scanline_convert(polygons, i, screen, zbuffer, colornormal, shading, extra, intensity):
     flip = False
@@ -293,6 +294,34 @@ def generate_torus( cx, cy, cz, r0, r1, step ):
             z = -1*math.sin(2*math.pi * rot) * (r0 * math.cos(2*math.pi * circ) + r1) + cz;
 
             points.append([x, y, z])
+    return points
+
+def add_mesh( edges, filename):
+    points = generate_mesh(filename)
+    file = open(filename, 'r')
+    for line in file.readlines():
+        line = re.sub(' +',' ',line).split(" ")
+        if line[0] == 'f':
+            vertices = line[1:]
+            counter = 2
+            while counter < len(vertices):
+                p0 = int(vertices[0]) - 1
+                p1 = int(vertices[counter - 1]) - 1
+                p2 = int(vertices[counter]) - 1
+                add_polygon(edges, points[p0][0], points[p0][1], points[p0][2],
+                                   points[p1][0], points[p1][1], points[p1][2],
+                                   points[p2][0], points[p2][1], points[p2][2])
+                counter += 1
+    file.close()
+
+def generate_mesh(filename):
+    points = []
+    file = open(filename, 'r')
+    for line in file.readlines():
+        line = re.sub(' +',' ',line).split(" ")
+        if line[0] == 'v':
+            points.append([float(line[1]), float(line[2]), float(line[3])])
+    file.close()
     return points
 
 def add_circle( points, cx, cy, cz, r, step ):

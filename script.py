@@ -235,6 +235,28 @@ def run(filename):
                 matrix_mult( stack[-1], tmp )
                 draw_polygons(tmp, screen, zbuffer, view, ambient, lights, areflect, dreflect, sreflect, shading, intensity)
                 tmp = []
+            elif c == 'mesh':
+                intensity = [0,0,0]
+                if command['constants'] != None:
+                    consts = symbols[command['constants']][1]
+                    areflect = [consts['red'][0],consts['green'][0],consts['blue'][0]]
+                    dreflect = [consts['red'][1],consts['green'][1],consts['blue'][1]]
+                    sreflect = [consts['red'][2],consts['green'][2],consts['blue'][2]]
+                    if len(consts['blue']) > 3:
+                        intensity[0] = consts['blue'][3]
+                        intensity[1] = consts['blue'][4]
+                        intensity[2] = consts['blue'][5]
+                else:
+                    areflect = [default[0],default[3],default[6]]
+                    dreflect = [default[1],default[4],default[7]]
+                    sreflect = [default[2],default[5],default[8]]
+                if command['cs'] != None:
+                    coords = command['cs']
+                add_mesh(tmp,
+                          args[0]+".obj")
+                matrix_mult( stack[-1], tmp )
+                draw_polygons(tmp, screen, zbuffer, view, ambient, lights, areflect, dreflect, sreflect, shading, intensity)
+                tmp = []
             elif c == 'line':
                 if command['constants'] != None:
                     consts = symbols[command['constants']][1]
