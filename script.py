@@ -147,7 +147,7 @@ def run(filename):
 
     for frame in range(int(num_frames)):
         #print frame
-        print symbols
+        #print symbols
 
         if "shading" in symbols.keys():
             shading = symbols["shading"][1]
@@ -299,6 +299,7 @@ def run(filename):
         screen = new_screen()
         zbuffer = new_zbuffer()
         tmp = []
+        lights = []
         step_3d = 20
 
     if is_anim:
