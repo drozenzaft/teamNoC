@@ -149,28 +149,6 @@ def draw_polygons( matrix, screen, zbuffer, view, ambient, light, areflect, dref
                 normals = [normal0, normal1, normal2]
                 extra = [view, ambient, light, areflect, dreflect, sreflect]
                 scanline_convert(matrix, point, screen, zbuffer, normals, shading, extra, intensity)
-
-            # draw_line( int(matrix[point][0]),
-            #            int(matrix[point][1]),
-            #            matrix[point][2],
-            #            int(matrix[point+1][0]),
-            #            int(matrix[point+1][1]),
-            #            matrix[point+1][2],
-            #            screen, zbuffer, color)
-            # draw_line( int(matrix[point+2][0]),
-            #            int(matrix[point+2][1]),
-            #            matrix[point+2][2],
-            #            int(matrix[point+1][0]),
-            #            int(matrix[point+1][1]),
-            #            matrix[point+1][2],
-            #            screen, zbuffer, color)
-            # draw_line( int(matrix[point][0]),
-            #            int(matrix[point][1]),
-            #            matrix[point][2],
-            #            int(matrix[point+2][0]),
-            #            int(matrix[point+2][1]),
-            #            matrix[point+2][2],
-            #            screen, zbuffer, color)
         point+= 3
 
 

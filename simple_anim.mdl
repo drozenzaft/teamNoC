@@ -1,4 +1,4 @@
-shading wireframe
+shading phong
 frames 100
 light l0 0.5 0.75 1 0 255 255
 basename simple
