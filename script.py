@@ -79,18 +79,21 @@ def second_pass(commands):
         if c == "vary":
             knob = command['knob']
             curr = args[2]
-            if args[4] <= 0:
+            if len(args) > 4 and args[4] <= 0:
                 print 'Must use an exponent greater than 0 for polynomial or exponential varying.'
                 return
             increment = (args[3] - args[2]) / (args[1] - args[0] + 1)
             for i in range(int(args[0]), int(args[1])+1):
-                if args[4] >= 0: 
+                if len(args) > 4 and args[4] >= 0: 
                     if increment < 0:
                         curr = ((increment * (i-args[1]-1)) ** args[4])
                     else:
                         curr = (increment * (i+1)) ** args[4]
+                    knobs[i][knob] = curr
+                else:
+                    knobs[i][knob] = curr
+                    curr += increment
                 print str(i) + ': ' + str(curr)
-                knobs[i][knob] = curr
             print '\n'
 
 def run(filename):
