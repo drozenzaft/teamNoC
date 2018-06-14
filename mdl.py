@@ -26,7 +26,7 @@ tokens = (
     "SAVE_KNOBS", 
     "TWEEN", 
     "FRAMES", 
-    "VARY", 
+    "VARY",
     "PUSH", 
     "POP", 
     "SAVE", 
@@ -279,7 +279,9 @@ def p_command_basename(p):
     commands.append(cmd)
 
 def p_command_vary(p):
-    """command : VARY SYMBOL NUMBER NUMBER NUMBER NUMBER"""
+    """command : VARY SYMBOL NUMBER NUMBER NUMBER NUMBER
+    | VARY SYMBOL NUMBER NUMBER NUMBER NUMBER TEXT
+    | VARY SYMBOL NUMBER NUMBER NUMBER NUMBER NUMBER"""
     cmd = {'op' : p[1], 'args' : p[3:], 'knob' : p[2]}
     symbols[p[2]] = ['knob', 0]
     commands.append(cmd)
@@ -311,7 +313,6 @@ def p_command_constants(p):
 
 def p_command_light(p):
     "command : LIGHT SYMBOL NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER"
-    print 'sounds like light'
     symbols[p[2]] = ['light', {'location' : p[3:6], 'color' : p[6:]}]
     cmd = {'op':p[1], 'args' : None, 'light' : p[2] }
     commands.append(cmd)
