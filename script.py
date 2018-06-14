@@ -84,17 +84,44 @@ def second_pass(commands):
                 return
             increment = (args[3] - args[2]) / (args[1] - args[0] + 1)
             for i in range(int(args[0]), int(args[1])+1):
-                if len(args) > 4 and args[4] >= 0: 
-                    if increment < 0:
-                        curr = ((increment * (i-args[1]-1)) ** args[4])
-                    else:
-                        curr = (increment * (i+1)) ** args[4]
-                    knobs[i][knob] = curr
+                if len(args) > 4:
+                    if isinstance(args[4],float):
+                        if increment < 0:
+                            curr = ((increment * (i-args[1]-1)) ** args[4])
+                        else:
+                            curr = (increment * (i+1)) ** args[4]
+                        knobs[i][knob] = curr
+                    elif  args[4] == 'sin':
+                        if increment < 0:
+                            curr = math.sin((increment * (i-args[1]-1) * math.pi/2))
+                        else:
+                            curr = math.sin((increment * (i+1) * math.pi/2))
+                        knobs[i][knob] = curr
+                    elif args[4] == 'cos':
+                        #the 1-cos accounts for cos being a decreasing function over the interval
+                        if increment < 0:
+                            curr = 1-math.cos((increment * (i-args[1]-1) * math.pi/2))
+                        else:
+                            curr = 1-math.cos((increment * (i+1) * math.pi/2))
+                        knobs[i][knob] = curr
+                    elif args[4] == 'tan':
+                        if increment < 0:
+                            curr = math.tan((increment * (i-args[1]-1) * math.pi/4))
+                        else:
+                            curr = math.tan((increment * (i+1) * math.pi/4))
+                        knobs[i][knob] = curr
+                    #i think i'm reaching here
+                    elif args[4] == 'ln':
+                        if increment < 0:
+                            curr = (2-math.log((increment * (i-args[1]-1) * math.e))) ** -1
+                        else:
+                            curr = (2-math.log((increment * (i+1) * math.e))) ** -1
+                        knobs[i][knob] = curr
                 else:
                     knobs[i][knob] = curr
                     curr += increment
-                print str(i) + ': ' + str(curr)
-            print '\n'
+                #print str(i) + ': ' + str(curr)
+            #print '\n'
 
 def run(filename):
     """
